@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JAYU STAR - Music Web</title>
+  
+  <!-- Load Google Font: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Load Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Custom Tailwind Configuration (to apply dark theme) -->
+  <script>
+    tailwind.config = {
+      theme: {
+        fontFamily: {
+          sans: ['Inter', 'sans-serif'],
+        },
+        extend: {
+          colors: {
+            // JAYU STAR - YouTube-inspired Dark Theme (from your project)
+            background: 'hsl(var(--background))',
+            foreground: 'hsl(var(--foreground))',
+            card: 'hsl(var(--card))',
+            'card-foreground': 'hsl(var(--card-foreground))',
+            popover: 'hsl(var(--popover))',
+            'popover-foreground': 'hsl(var(--popover-foreground))',
+            primary: {
+              DEFAULT: 'hsl(var(--primary))',
+              foreground: 'hsl(var(--primary-foreground))',
+            },
+            secondary: {
+              DEFAULT: 'hsl(var(--secondary))',
+              foreground: 'hsl(var(--secondary-foreground))',
+            },
+            muted: {
+              DEFAULT: 'hsl(var(--muted))',
+              foreground: 'hsl(var(--muted-foreground))',
+            },
+            accent: {
+              DEFAULT: 'hsl(var(--accent))',
+              foreground: 'hsl(var(--accent-foreground))',
+            },
+            destructive: {
+              DEFAULT: 'hsl(var(--destructive))',
+              foreground: 'hsl(var(--destructive-foreground))',
+            },
+            border: 'hsl(var(--border))',
+            input: 'hsl(var(--input))',
+            ring: 'hsl(var(--ring))',
+          },
+          borderRadius: {
+            lg: "var(--radius)",
+            md: "calc(var(--radius) - 2px)",
+            sm: "calc(var(--radius) - 4px)",
+          },
+        },
+      },
+    };
+  </script>
+
+  <!-- Custom Styles (CSS Variables and Base Styles) -->
+  <style type="text/css">
+    :root {
+      /* HSL Color Definitions from your project */
+      --background: 0 0% 6%;         /* #0F0F0F */
+      --foreground: 0 0% 100%;        /* White */
+      --card: 0 0% 15%;               /* #272727 */
+      --card-foreground: 0 0% 100%;
+      --popover: 0 0% 15%;
+      --popover-foreground: 0 0% 100%;
+      --primary: 0 0% 6%;
+      --primary-foreground: 0 0% 100%;
+      --secondary: 0 0% 15%;          /* #272727 */
+      --secondary-foreground: 0 0% 100%;
+      --muted: 0 0% 20%;
+      --muted-foreground: 0 0% 60%;
+      --accent: 0 100% 50%;           /* #FF0000 */
+      --accent-foreground: 0 0% 100%;
+      --destructive: 0 84.2% 60.2%;
+      --destructive-foreground: 0 0% 100%;
+      --border: 0 0% 20%;
+      --input: 0 0% 20%;
+      --ring: 0 100% 50%;
+      --radius: 0.5rem;
+    }
+
+    body {
+      @apply bg-background text-foreground font-sans;
+    }
+    
+    /* Custom scrollbar for topic bar */
+    .topic-scrollbar::-webkit-scrollbar {
+      height: 0px;
+    }
+    .topic-scrollbar {
+      scrollbar-width: none; /* Firefox */
+      -ms-overflow-style: none; /* IE and Edge */
+    }
+  </style>
+  
+  <!-- *** FIX: Load standalone Lucide icons (no React needed) *** -->
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+
+<body class="min-h-screen bg-background">
+
+  <div id="app" class="pb-16 md:pb-0">
+    <!-- Header -->
+    <header class="sticky top-0 z-50 bg-primary border-b border-border">
+      <div class="flex items-center justify-between h-14 px-4 gap-4">
+        <!-- Logo -->
+        <button id="header-logo" class="text-foreground font-bold text-xl hover:text-accent transition-colors">
+          JAYU STAR
+        </button>
+
+        <!-- Search - Hidden on mobile -->
+        <div class="hidden md:flex flex-1 max-w-2xl">
+          <div class="relative w-full">
+            <input
+              type="search"
+              placeholder="Search"
+              class="w-full bg-secondary border-border pr-10 h-10 rounded-md px-3 text-sm placeholder:text-muted-foreground"
+            />
+            <button
+              class="absolute right-0 top-0 h-full px-3 text-muted-foreground"
+            >
+              <!-- This <i> tag will be replaced by Lucide -->
+              <i data-lucide="search" class="h-5 w-5"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Action Icons -->
+        <div class="flex items-center gap-2">
+          <button class="p-2 rounded-full hover:bg-secondary">
+            <i data-lucide="video" class="h-5 w-5"></i>
+          </button>
+          <button class="p-2 rounded-full hover:bg-secondary">
+            <i data-lucide="bell" class="h-5 w-5"></i>
+          </button>
+          <button class="p-2 rounded-full hover:bg-secondary">
+            <i data-lucide="circle-user" class="h-5 w-5"></i>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div class="flex">
+      <!-- Desktop Sidebar -->
+      <aside class="hidden md:block w-60 bg-secondary border-r border-border h-[calc(100vh-3.5rem)] fixed">
+        <div class="py-4 space-y-1 overflow-y-auto h-full">
+          <button class="w-full flex items-center gap-4 px-4 py-2 bg-muted text-accent rounded-md">
+            <i data-lucide="home" class="h-5 w-5"></i>
+            <span>Home</span>
+          </button>
+          <button class="w-full flex items-center gap-4 px-4 py-2 text-foreground hover:bg-muted rounded-md">
+            <i data-lucide="trending-up" class="h-5 w-5"></i>
+            <span>Trending</span>
+          </button>
+          <button class="w-full flex items-center gap-4 px-4 py-2 text-foreground hover:bg-muted rounded-md">
+            <i data-lucide="folder" class="h-5 w-5"></i>
+            <span>Subscriptions</span>
+          </button>
+          <hr class="border-border my-2" />
+          <!-- Library button changed to Admin -->
+          <button id="desktop-nav-library" class="w-full flex items-center gap-4 px-4 py-2 text-foreground hover:bg-muted rounded-md">
+            <i data-lucide="shield" class="h-5 w-5"></i>
+            <span>Admin</span>
+          </button>
+          <button class="w-full flex items-center gap-4 px-4 py-2 text-foreground hover:bg-muted rounded-md">
+            <i data-lucide="history" class="h-5 w-5"></i>
+            <span>History</span>
+          </button>
+          <button class="w-full flex items-center gap-4 px-4 py-2 text-foreground hover:bg-muted rounded-md">
+            <i data-lucide="clock" class="h-5 w-5"></i>
+            <span>Watch Later</span>
+          </button>
+        </div>
+      </aside>
+
+      <!-- Main Content Area -->
+      <main class="flex-1 md:ml-64">
+      
+        <!-- Home Page (Visible by default) -->
+        <div id="home-page">
+          <!-- Topic Bar -->
+          <div class="sticky top-14 z-40 bg-primary border-b border-border">
+            <!-- Added id="topic-bar-buttons" to attach click listener -->
+            <div class="flex gap-2 px-4 py-3 overflow-x-auto topic-scrollbar" id="topic-bar-buttons">
+              <button class="whitespace-nowrap px-3 py-1.5 rounded-md text-sm bg-foreground text-primary">All</button>
+              <button class="whitespace-nowrap px-3 py-1.5 rounded-md text-sm bg-secondary hover:bg-muted">Music</button>
+              <button class="whitespace-nowrap px-3 py-1.5 rounded-md text-sm bg-secondary hover:bg-muted">Live</button>
+              <button class="whitespace-nowrap px-3 py-1.5 rounded-md text-sm bg-secondary hover:bg-muted">Remix</button>
+              <button class="whitespace-nowrap px-3 py-1.5 rounded-md text-sm bg-secondary hover:bg-muted">Lo-Fi</button>
+              <button class="whitespace-nowrap px-3 py-1.5 rounded-md text-sm bg-secondary hover:bg-muted">Hip Hop</button>
+              <button class="whitespace-nowrap px-3 py-1.5 rounded-md text-sm bg-secondary hover:bg-muted">Rock</button>
+              <button class="whitespace-nowrap px-3 py-1.5 rounded-md text-sm bg-secondary hover:bg-muted">Indie</button>
+              <button class="whitespace-nowrap px-3 py-1.5 rounded-md text-sm bg-secondary hover:bg-muted">Classical</button>
+              <button class="whitespace-nowrap px-3 py-1.5 rounded-md text-sm bg-secondary hover:bg-muted">Pop</button>
+            </div>
+          </div>
+          
+          <!-- Video Grid -->
+          <div id="video-grid-container" class="px-4 py-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-4 gap-y-8">
+            <!-- Videos will be injected here by JavaScript -->
+          </div>
+        </div>
+
+        <!-- Watch Page (Hidden by default) -->
+        <div id="watch-page" class="hidden">
+          <div id="watch-page-content" class="p-4 lg:p-8">
+            <!-- Watch page content will be injected here by JavaScript -->
+          </div>
+        </div>
+        
+        <!-- Dashboard Page (Hidden by default) -->
+        <div id="dashboard-page" class="hidden">
+          <div class="p-4 lg:p-8 space-y-8">
+            <h1 class="text-3xl font-bold">Admin Dashboard</h1>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <!-- Add Video Form -->
+              <section class="bg-secondary rounded-lg p-6 space-y-4">
+                <h2 class="text-2xl font-semibold">Add New Video</h2>
+                <form id="add-video-form" class="space-y-4">
+                  <div>
+                    <label for="add-title" class="block text-sm font-medium text-muted-foreground mb-1">Title</label>
+                    <input type="text" id="add-title" required class="w-full bg-input rounded-md h-10 px-3 text-sm" />
+                  </div>
+                  <div>
+                    <label for="add-thumbnail" class="block text-sm font-medium text-muted-foreground mb-1">Thumbnail URL</label>
+                    <input type="text" id="add-thumbnail" required class="w-full bg-input rounded-md h-10 px-3 text-sm" placeholder="https://images.unsplash.com/..." />
+                  </div>
+                  <div>
+                    <label for="add-channel" class="block text-sm font-medium text-muted-foreground mb-1">Channel Name</label>
+                    <input type="text" id="add-channel" required class="w-full bg-input rounded-md h-10 px-3 text-sm" />
+                  </div>
+                  <div>
+                    <label for="add-category" class="block text-sm font-medium text-muted-foreground mb-1">Category</label>
+                    <input type="text" id="add-category" required class="w-full bg-input rounded-md h-10 px-3 text-sm" placeholder="e.g., Live, Pop, Remix" />
+                  </div>
+                  <!-- NEW FIELD: YouTube Link -->
+                  <div>
+                    <label for="add-youtube-link" class="block text-sm font-medium text-muted-foreground mb-1">YouTube Link</label>
+                    <input type="text" id="add-youtube-link" class="w-full bg-input rounded-md h-10 px-3 text-sm" placeholder="https://www.youtube.com/watch?v=..." />
+                  </div>
+                  <!-- NEW FIELD: Drive MP3 Link -->
+                  <div>
+                    <label for="add-drive-link" class="block text-sm font-medium text-muted-foreground mb-1">Drive MP3 Download Link</label>
+                    <input type="text" id="add-drive-link" class="w-full bg-input rounded-md h-10 px-3 text-sm" placeholder="https://drive.google.com/..." />
+                  </div>
+                  <button type="submit" class="w-full bg-accent text-accent-foreground h-10 rounded-md font-semibold hover:bg-accent/90">
+                    Add Video
+                  </button>
+                </form>
+              </section>
+
+              <!-- Manage Videos List -->
+              <section>
+                <h2 class="text-2xl font-semibold mb-4">Manage Videos</h2>
+                <div id="dashboard-video-list" class="space-y-3 max-h-[500px] overflow-y-auto bg-secondary p-4 rounded-lg">
+                  <!-- Video list will be injected here -->
+                </div>
+              </section>
+            </div>
+          </div>
+        </div>
+
+      </main>
+    </div>
+
+    <!-- Mobile Bottom Navigation -->
+    <footer class="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-secondary border-t border-border">
+      <div class="flex justify-around h-16 items-center">
+        <button id="bottom-nav-home" class="flex flex-col items-center justify-center gap-1 text-accent">
+          <i data-lucide="home" class="h-5 w-5"></i>
+          <span class="text-xs font-medium">Home</span>
+        </button>
+        <button class="flex flex-col items-center justify-center gap-1 text-muted-foreground hover:text-foreground">
+          <i data-lucide="trending-up" class="h-5 w-5"></i>
+          <span class="text-xs font-medium">Trending</span>
+        </button>
+        <button class="flex flex-col items-center justify-center gap-1 text-muted-foreground hover:text-foreground">
+          <i data-lucide="folder" class="h-5 w-5"></i>
+          <span class="text-xs font-medium">Subscriptions</span>
+        </button>
+        <!-- Library button changed to Admin -->
+        <button id="bottom-nav-library" class="flex flex-col items-center justify-center gap-1 text-muted-foreground hover:text-foreground">
+          <i data-lucide="shield" class="h-5 w-5"></i>
+          <span class="text-xs font-medium">Admin</span>
+        </button>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Login Modal (Hidden by default) -->
+  <div id="login-modal" class="hidden fixed inset-0 z-[100] bg-black/80 flex items-center justify-center p-4">
+    <div class="bg-secondary rounded-lg p-6 w-full max-w-sm space-y-4 relative">
+      <button id="close-login-button" class="absolute top-2 right-2 p-2 text-muted-foreground hover:text-foreground">
+        <i data-lucide="x" class="h-5 w-5"></i>
+      </button>
+      <h2 class="text-xl font-semibold text-center">Admin Login</h2>
+      <div>
+        <label for="password-input" class="block text-sm font-medium text-muted-foreground mb-1">Password</label>
+        <input type="password" id="password-input" class="w-full bg-input rounded-md h-10 px-3 text-sm" />
+      </div>
+      <p id="login-error" class="hidden text-sm text-red-500"></p>
+      <button id="login-button" class="w-full bg-accent text-accent-foreground h-10 rounded-md font-semibold hover:bg-accent/90">
+        Login
+      </button>
+    </div>
+  </div>
+
+
+  <!-- Main Application JavaScript -->
+  <script type="text/javascript">
+    // --- 1. DATA ---
+    // Make mockVideos mutable with 'let'
+    let mockVideos = [
+      {
+        id: "1",
+        thumbnailUrl: "https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=800&q=80",
+        videoTitle: "Amazing Music Performance | Live Concert 2024",
+        channelName: "Music Channel",
+        channelIconUrl: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=100&q=80",
+        viewCount: "1.2M",
+        uploadTime: "2 days ago",
+        description: "Experience the magic of live music with this breathtaking performance from the 2024 world tour. High-energy, passion, and incredible vocals.",
+        category: "Live",
+        youtubeLink: "https://www.youtube.com/watch?v=dQw4w9WgXcQ", // Example
+        driveLink: "" // Example
+      },
+      {
+        id: "2",
+        thumbnailUrl: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=800&q=80",
+        videoTitle: "Lo-Fi Beats to Relax/Study To",
+        channelName: "ChillHop Central",
+        channelIconUrl: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&q=80",
+        viewCount: "850K",
+        uploadTime: "5 days ago",
+        description: "Just a stream of the best chillhop and lo-fi beats for studying, relaxing, or coding. 24/7.",
+        category: "Lo-Fi",
+        youtubeLink: "https://www.youtube.com/watch?v=5qap5aO4i9A", // Example
+        driveLink: "https://google.com/drive" // Example placeholder
+      },
+      {
+        id: "3",
+        thumbnailUrl: "https://images.unsplash.com/photo-1516223725357-60f4d380b22a?w=800&q=80",
+        videoTitle: "Learn Guitar in 30 Days - Lesson 1: Your First Chords",
+        channelName: "GuitarHero",
+        channelIconUrl: "https://images.unsplash.com/photo-1527980965255-d3b416303d12?w=100&q=80",
+        viewCount: "2.1M",
+        uploadTime: "1 week ago",
+        description: "My 30-day guitar challenge starts now! In Lesson 1, we cover the absolute basics: holding the guitar, C chord, and G chord. You can do this!",
+        category: "Music",
+        youtubeLink: "",
+        driveLink: ""
+      },
+      {
+        id: "4",
+        thumbnailUrl: "https://images.unsplash.com/photo-1460723237483-7a6dc9d0a212?w=800&q=80",
+        videoTitle: "Classical Music for Deep Focus and Concentration",
+        channelName: "Mozart Minds",
+        channelIconUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&q=80",
+        viewCount: "620K",
+        uploadTime: "3 days ago",
+        description: "A 3-hour compilation of the best classical pieces from Mozart, Beethoven, and Bach to enhance your focus and productivity.",
+        category: "Classical",
+        youtubeLink: "",
+        driveLink: ""
+      },
+      {
+        id: "5",
+        thumbnailUrl: "https://images.unsplash.com/photo-1510915361894-db8b60106cb1?w=800&q=80",
+        videoTitle: "Rock Anthems of the 80s | Epic Mixtape",
+        channelName: "RockOn",
+        channelIconUrl: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&q=80",
+        viewCount: "450K",
+        uploadTime: "1 day ago",
+        description: "Crank up the volume! All the best 80s rock hits in one playlist. Perfect for a road trip or a workout.",
+        category: "Rock",
+        youtubeLink: "",
+        driveLink: ""
+      },
+      {
+        id: "6",
+        thumbnailUrl: "https://images.unsplash.com/photo-1506157786151-b8491531f063?w=800&q=80",
+        videoTitle: "Festival Vibes 2024 - Official Aftermovie",
+        channelName: "EDM Universe",
+        channelIconUrl: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&q=80",
+        viewCount: "1.8M",
+        uploadTime: "4 days ago",
+        description: "Relive the best moments from Summer Fest 2024. See you next year!",
+        category: "Live",
+        youtubeLink: "",
+        driveLink: ""
+      },
+      {
+        id: "7",
+        thumbnailUrl: "https://images.unsplash.com/photo-1594623930312-28c4600f7c22?w=800&q=80",
+        videoTitle: "Best of 90s Hip Hop",
+        channelName: "Old School Tapes",
+        channelIconUrl: "https://images.unsplash.com/photo-1552234994-66ba23422aD6?w=100&q=80",
+        viewCount: "700K",
+        uploadTime: "1 week ago",
+        description: "All the classics from the golden age of Hip Hop.",
+        category: "Hip Hop",
+        youtubeLink: "",
+        driveLink: ""
+      },
+      {
+        id: "8",
+        thumbnailUrl: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&q=80",
+        videoTitle: "Top Pop Hits 2024",
+        channelName: "Pop Central",
+        channelIconUrl: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&q=80",
+        viewCount: "3.1M",
+        uploadTime: "2 days ago",
+        description: "The biggest songs in the world right now.",
+        category: "Pop",
+        youtubeLink: "",
+        driveLink: ""
+      },
+      {
+        id: "9",
+        thumbnailUrl: "https://images.unsplash.com/photo-1525362083224-6b3d5b786b54?w=800&q=80",
+        videoTitle: "Indie Chill Playlist",
+        channelName: "The Alternative",
+        channelIconUrl: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100&q=80",
+        viewCount: "300K",
+        uploadTime: "5 days ago",
+        description: "Relax with these indie gems.",
+        category: "Indie",
+        youtubeLink: "",
+        driveLink: ""
+      },
+      {
+        id: "10",
+        thumbnailUrl: "https://images.unsplash.com/photo-1498038432885-c6f3e1b9a786?w=800&q=80",
+        videoTitle: "EDM Remixes of Popular Songs",
+        channelName: "Remix Rewind",
+        channelIconUrl: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=100&q=80",
+        viewCount: "1.9M",
+        uploadTime: "3 days ago",
+        description: "Your favorite pop songs, remixed!",
+        category: "Remix",
+        youtubeLink: "",
+        driveLink: ""
+      }
+    ];
+
+    // --- 2. DOM Elements ---
+    let homePage, watchPage, videoGrid, watchContent;
+    let headerLogo, bottomNavHome, topicBarButtons;
+    // New Dashboard & Login Elements
+    let loginModal, loginButton, closeLoginButton, passwordInput, loginError;
+    let dashboardPage, addVideoForm, dashboardVideoList;
+    let bottomNavLibrary, desktopNavLibrary;
+
+
+    // --- 3. Page Navigation Logic ---
+    function handleGoHome() {
+      homePage.classList.remove('hidden');
+      watchPage.classList.add('hidden');
+      dashboardPage.classList.add('hidden'); // Hide dashboard
+      loginModal.classList.add('hidden'); // Hide login modal
+      // Scroll to top
+      window.scrollTo(0, 0);
+    }
+
+    function handleVideoSelect(videoId) {
+      homePage.classList.add('hidden');
+      watchPage.classList.remove('hidden');
+      dashboardPage.classList.add('hidden'); // Hide dashboard
+      loginModal.classList.add('hidden'); // Hide login modal
+      // Render the watch page content
+      renderWatchPage(videoId);
+      // Scroll to top
+      window.scrollTo(0, 0);
+    }
+    
+    // --- New Admin/Dashboard Functions ---
+
+    function showLoginPage() {
+      passwordInput.value = ''; // Clear password
+      loginError.classList.add('hidden'); // Hide old errors
+      loginModal.classList.remove('hidden'); // Show modal
+    }
+    
+    function closeLoginPage() {
+      loginModal.classList.add('hidden');
+    }
+    
+    function showDashboardPage() {
+      homePage.classList.add('hidden');
+      watchPage.classList.add('hidden');
+      loginModal.classList.add('hidden');
+      dashboardPage.classList.remove('hidden');
+      
+      renderDashboardList();
+      window.scrollTo(0, 0);
+    }
+    
+    function handleLogin() {
+      const pass = passwordInput.value;
+      if (pass === 'jayu143') {
+        showDashboardPage();
+      } else {
+        loginError.textContent = 'Wrong password. Please try again.';
+        loginError.classList.remove('hidden');
+      }
+    }
+    
+    function handleAddVideo(event) {
+      event.preventDefault(); // Prevent form from reloading page
+      
+      // Get values from form
+      const title = document.getElementById('add-title').value;
+      const thumbnail = document.getElementById('add-thumbnail').value;
+      const channel = document.getElementById('add-channel').value;
+      const category = document.getElementById('add-category').value;
+      const youtubeLink = document.getElementById('add-youtube-link').value;
+      const driveLink = document.getElementById('add-drive-link').value;
+      
+      const newVideo = {
+        id: Date.now().toString(), // Simple unique ID
+        thumbnailUrl: thumbnail,
+        videoTitle: title,
+        channelName: channel,
+        channelIconUrl: 'https://placehold.co/100x100/272727/FFFFFF?text=' + channel[0], // Placeholder icon
+        viewCount: "0",
+        uploadTime: "Just now",
+        description: "Newly added video.",
+        category: category,
+        youtubeLink: youtubeLink || "", // Store as empty string if blank
+        driveLink: driveLink || ""      // Store as empty string if blank
+      };
+      
+      mockVideos.push(newVideo); // Add to our "database"
+      
+      renderDashboardList(); // Update dashboard list
+      renderHomePage('All'); // Update home page grid
+      
+      event.target.reset(); // Clear the form
+    }
+    
+    function handleDeleteVideo(videoId) {
+      // Find index
+      const index = mockVideos.findIndex(v => v.id === videoId);
+      if (index > -1) {
+        mockVideos.splice(index, 1); // Remove from array
+      }
+      
+      renderDashboardList(); // Update dashboard list
+      renderHomePage('All'); // Update home page grid
+    }
+
+
+    // --- 4. HTML Render Functions ---
+
+    /**
+     * Renders the list of videos for the Admin Dashboard
+     */
+    function renderDashboardList() {
+      if (!dashboardVideoList) return;
+      
+      let listHtml = '';
+      [...mockVideos].reverse().forEach(video => { // Show newest first
+        listHtml += `
+          <div class="flex items-center justify-between bg-input p-3 rounded-md">
+            <div class="flex items-center gap-3 min-w-0">
+              <img src="${video.thumbnailUrl}" alt="" class="h-10 w-16 object-cover rounded-md flex-shrink-0" />
+              <p class="text-sm font-medium truncate">${video.videoTitle}</p>
+            </div>
+            <button onclick="handleDeleteVideo('${video.id}')" class="text-red-500 hover:text-red-400 p-2 flex-shrink-0">
+              <i data-lucide="trash-2" class="h-4 w-4"></i>
+            </button>
+          </div>
+        `;
+      });
+      
+      dashboardVideoList.innerHTML = listHtml;
+      renderIcons(); // Re-render icons after changing HTML
+    }
+
+
+    /**
+     * Creates the HTML for a single video card (for home page or sidebar)
+     */
+    function createVideoCardHTML(video) {
+      // Must use "handleVideoSelect" (as a string) to work with onclick
+      return `
+        <div class="cursor-pointer group space-y-3" onclick="handleVideoSelect('${video.id}')">
+          <!-- Thumbnail -->
+          <div class="relative overflow-hidden rounded-lg bg-muted aspect-video">
+            <img
+              src="${video.thumbnailUrl}"
+              alt="${video.videoTitle}"
+              class="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
+              onerror="this.src='https://placehold.co/800x450/272727/FF0000?text=Image+Error'"
+            />
+          </div>
+          <!-- Video Details -->
+          <div class="flex gap-3">
+            <img
+              src="${video.channelIconUrl}"
+              alt="${video.channelName}"
+              class="h-9 w-9 flex-shrink-0 rounded-full object-cover"
+              onerror="this.src='https://placehold.co/100x100/272727/FFFFFF?text=A'"
+            />
+            <div class="flex-1 min-w-0">
+              <h3 class="text-sm font-semibold text-foreground line-clamp-2 mb-1">
+                ${video.videoTitle}
+              </h3>
+              <p class="text-xs text-muted-foreground">${video.channelName}</p>
+              <p class="text-xs text-muted-foreground">
+                ${video.viewCount} views • ${video.uploadTime}
+              </p>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    /**
+     * Creates the HTML for the mock comments
+     */
+    function createCommentsHTML() {
+      return `
+        <div class="space-y-4">
+          <h2 class="text-xl font-semibold">Comments (3)</h2>
+          <div class="flex gap-3">
+            <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&q=80" alt="User 1" class="h-9 w-9 rounded-full object-cover"/>
+            <div>
+              <p class="text-sm font-semibold">CodeMaster</p>
+              <p class="text-sm">This is an amazing track! 🔥</p>
+            </div>
+          </div>
+          <div class="flex gap-3">
+            <img src="https://images.unsplash.com/photo-1527980965255-d3b416303d12?w=100&q=80" alt="User 2" class="h-9 w-9 rounded-full object-cover"/>
+            <div>
+              <p class="text-sm font-semibold">MusicLover22</p>
+              <p class="text-sm">Perfect for my study session. Thanks!</p>
+            </div>
+          </div>
+          <div class="flex gap-3">
+            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&q=80" alt="User 3" class="h-9 w-9 rounded-full object-cover"/>
+            <div>
+              <p class="text-sm font-semibold">Alex</p>
+              <p class="text-sm">What's the song at 10:30?</p>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    /**
+     * Handles clicking on a topic button
+     */
+    function handleTopicClick(event) {
+      const clickedButton = event.target.closest('button');
+      if (!clickedButton) return; // Clicked on the container, not a button
+
+      const category = clickedButton.textContent;
+
+      // Update active state
+      // 1. Remove active class from all buttons
+      const allButtons = topicBarButtons.querySelectorAll('button');
+      allButtons.forEach(button => {
+        button.classList.remove('bg-foreground', 'text-primary');
+        button.classList.add('bg-secondary', 'hover:bg-muted');
+      });
+
+      // 2. Add active class to the clicked button
+      clickedButton.classList.add('bg-foreground', 'text-primary');
+      clickedButton.classList.remove('bg-secondary', 'hover:bg-muted');
+      
+      // 3. Re-render the homepage with the filtered category
+      renderHomePage(category);
+    }
+
+    /**
+     * Renders the Video Grid on the Home Page
+     */
+    function renderHomePage(category = 'All') {
+      let gridHtml = '';
+      
+      const videosToRender = (category === 'All')
+        ? mockVideos
+        : mockVideos.filter(video => video.category === category);
+
+      if (videosToRender.length === 0) {
+        gridHtml = `<p class="text-muted-foreground col-span-full text-center py-8">No videos found for "${category}".</p>`;
+      } else {
+        videosToRender.forEach(video => {
+          gridHtml += createVideoCardHTML(video);
+        });
+      }
+      
+      videoGrid.innerHTML = gridHtml;
+    }
+
+    /**
+     * Renders the Watch Page content
+     */
+    function renderWatchPage(videoId) {
+      const video = mockVideos.find(v => v.id === videoId);
+      if (!video) {
+        watchContent.innerHTML = '<p>Video not found.</p>';
+        return;
+      }
+      
+      const suggestedVideos = mockVideos.filter(v => v.id !== videoId).slice(0, 3);
+      let suggestedHtml = '';
+      suggestedVideos.forEach(vid => {
+        suggestedHtml += createVideoCardHTML(vid);
+      });
+      
+      const commentsHtml = createCommentsHTML();
+
+      const watchHtml = `
+        <div class="flex flex-col lg:flex-row gap-8">
+          <!-- Main Content (Player, Info, Comments) -->
+          <div class="flex-1">
+            <!-- Video Player Placeholder -->
+            <div class="relative mb-4 overflow-hidden rounded-lg bg-muted aspect-video">
+              <img
+                src="${video.thumbnailUrl}"
+                alt="${video.videoTitle}"
+                class="object-cover w-full h-full"
+              />
+              <div class="absolute inset-0 flex items-center justify-center bg-black/50">
+                <p class="text-2xl font-bold text-white">[ Video Player Placeholder ]</p>
+              </div>
+            </div>
+
+            <!-- Video Info -->
+            <h1 class="text-xl lg:text-2xl font-bold mb-2">${video.videoTitle}</h1>
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+              <!-- Channel Info -->
+              <div class="flex items-center gap-3">
+                <img src="${video.channelIconUrl}" alt="${video.channelName}" class="h-10 w-10 rounded-full object-cover"/>
+                <div>
+                  <p class="font-semibold">${video.channelName}</p>
+                  <p class="text-xs text-muted-foreground">
+                    ${video.viewCount} views • ${video.uploadTime}
+                  </p>
+                </div>
+              </div>
+              
+              <!-- Action Buttons -->
+              <div class="flex items-center gap-2 flex-wrap">
+                <button class="bg-secondary hover:bg-muted text-sm px-3 py-1.5 rounded-md flex items-center gap-2">
+                  <i data-lucide="thumbs-up" class="h-4 w-4"></i> Like
+                </button>
+                <button class="bg-secondary hover:bg-muted text-sm px-3 py-1.5 rounded-md flex items-center gap-2">
+                  <i data-lucide="thumbs-down" class="h-4 w-4"></i> Dislike
+                </button>
+                <button class="bg-secondary hover:bg-muted text-sm px-3 py-1.5 rounded-md flex items-center gap-2">
+                  <i data-lucide="share" class="h-4 w-4"></i> Share
+                </button>
+
+                <!-- UPDATED/NEW BUTTONS -->
+                ${video.youtubeLink ? `
+                  <a href="${video.youtubeLink}" target="_blank" rel="noopener noreferrer" class="bg-red-600 hover:bg-red-700 text-white text-sm px-3 py-1.5 rounded-md flex items-center gap-2">
+                    <i data-lucide="youtube" class="h-4 w-4"></i> YouTube
+                  </a>
+                ` : ''}
+                
+                ${video.driveLink ? `
+                  <a href="${video.driveLink}" target="_blank" class="bg-blue-500 hover:bg-blue-600 text-white text-sm px-3 py-1.5 rounded-md flex items-center gap-2">
+                    <i data-lucide="download" class="h-4 w-4"></i> Download
+                  </a>
+                ` : `
+                  <button classs="bg-secondary hover:bg-muted text-sm px-3 py-1.5 rounded-md flex items-center gap-2 opacity-50 cursor-not-allowed">
+                    <i data-lucide="download" class="h-4 w-4"></i> Download
+                  </button>
+                `}
+              </div>
+            </div>
+
+            <!-- Description Box -->
+            <div class="bg-secondary rounded-lg p-4 mb-6">
+              <p class="text-sm whitespace-pre-wrap">
+                ${video.description || "No description available."}
+              </p>
+            </div>
+
+            <hr class="border-border my-6" />
+
+            <!-- Comments (Visible on mobile) -->
+            <div class="lg:hidden">
+              ${commentsHtml}
+            </div>
+          </div>
+
+          <!-- Suggested Videos (Sidebar) -->
+          <aside class="w-full lg:w-80 xl:w-96 space-y-4">
+            <h2 class="text-xl font-semibold">Up next</h2>
+            ${suggestedHtml}
+            
+            <!-- Comments (Visible on desktop) -->
+            <div class="hidden lg:block pt-4">
+              <hr class="border-border my-6" />
+              ${commentsHtml}
+            </div>
+          </aside>
+        </div>
+      `;
+      
+      watchContent.innerHTML = watchHtml;
+      
+      // We must re-render icons after changing innerHTML
+      renderIcons();
+    }
+
+    // --- 5. Icon Rendering (Simplified) ---
+    function renderIcons() {
+      // Ensure lucide is loaded
+      if (typeof lucide === 'undefined' || typeof lucide.createIcons !== 'function') {
+        console.error('Lucide icons library is not loaded.');
+        return;
+      }
+      
+      // This finds all [data-lucide] elements and replaces them with SVGs,
+      // inheriting all attributes (like class).
+      lucide.createIcons();
+    }
+
+    // --- 6. Initialization ---
+    window.onload = function() {
+      // Get element references
+      homePage = document.getElementById('home-page');
+      watchPage = document.getElementById('watch-page');
+      videoGrid = document.getElementById('video-grid-container');
+      watchContent = document.getElementById('watch-page-content');
+      headerLogo = document.getElementById('header-logo');
+      bottomNavHome = document.getElementById('bottom-nav-home');
+      topicBarButtons = document.getElementById('topic-bar-buttons');
+      
+      // Get new elements
+      loginModal = document.getElementById('login-modal');
+      loginButton = document.getElementById('login-button');
+      closeLoginButton = document.getElementById('close-login-button');
+      passwordInput = document.getElementById('password-input');
+      loginError = document.getElementById('login-error');
+      dashboardPage = document.getElementById('dashboard-page');
+      addVideoForm = document.getElementById('add-video-form');
+      dashboardVideoList = document.getElementById('dashboard-video-list');
+      bottomNavLibrary = document.getElementById('bottom-nav-library');
+      desktopNavLibrary = document.getElementById('desktop-nav-library');
+
+      // Attach event listeners
+      headerLogo.onclick = handleGoHome;
+      bottomNavHome.onclick = handleGoHome;
+      topicBarButtons.onclick = handleTopicClick;
+      
+      // Attach new listeners
+      bottomNavLibrary.onclick = showLoginPage;
+      desktopNavLibrary.onclick = showLoginPage;
+      closeLoginButton.onclick = closeLoginPage;
+      loginButton.onclick = handleLogin;
+      addVideoForm.onsubmit = handleAddVideo;
+
+      // Initial Render
+      renderHomePage('All'); // <-- Call with 'All'
+      renderIcons(); // Initial icon render
+    };
+  </script>
+</body>
+</html>
+
